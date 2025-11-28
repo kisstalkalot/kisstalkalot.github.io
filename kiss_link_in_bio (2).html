@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>kiss</title>
+  <link rel="icon" type="image/gif" href="icon.gif">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: black;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    video.bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    #enter-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #container {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      padding: 18px;
+      background: rgba(20,20,20,0.8);
+      border: 2px solid black;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      text-align: center;
+    }
+
+    .pfp-wrapper {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 10px auto;
+      border-radius: 50%;
+      padding: 4px;
+      border: 3px solid grey;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .pfp {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    #bio { font-size: 14px; opacity: 0.8; margin: 8px 0 16px 0; }
+
+    .icons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .icons img {
+      width: 22px;
+      opacity: 0.9;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .icons img:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('parallax_layer.png') center/cover no-repeat;
+      opacity: 0.25;
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+
+    :root {
+      --move-x: 0px;
+      --move-y: 0px;
+    }
+
+    #container {
+      transform: translate(calc(-50% + var(--move-x)), calc(-50% + var(--move-y)));
+      transition: transform 0.12s ease;
+    }
+
+</style>
+</head>
+<body>
+
+  <video class="bg" id="bgVideo" src="bg.mp4" autoplay loop muted></video>
+
+  <div id="enter-screen">click anywhere</div>
+
+  <div id="container">
+    <div id="pfpRing" class="pfp-wrapper">
+      <img class="pfp" src="pfp.webp" />
+    </div>
+
+    <div id="bio">i am kiss666</div>
+
+    <div class="icons">
+      <a href="https://steamcommunity.com/id/suchadrunkfuckkkk/" target="_blank">
+        <img src="steam.gif">
+      </a>
+
+      <a href="https://last.fm/user/dopesmoker777" target="_blank">
+        <img src="lastfm.gif">
+      </a>
+
+      <a href="https://discord.com/users/1379582916861886527" target="_blank">
+        <img src="discord.gif">
+      </a>
+    </div>
+  </div>
+
+  <audio id="song" src="song.mp3"></audio>
+
+  <script>
+    const enter = document.getElementById("enter-screen");
+    const bgVideo = document.getElementById("bgVideo");
+    const container = document.getElementById("container");
+    const song = document.getElementById("song");
+
+    enter.addEventListener("click", () => {
+      enter.style.opacity = 0;
+      setTimeout(() => enter.remove(), 800);
+
+      bgVideo.style.opacity = 1;
+      container.style.opacity = 1;
+
+      song.volume = 0.7;
+      song.play().catch(() => {});
+    });
+
+    const ring = document.getElementById("pfpRing");
+    ring.style.borderColor = "green";
+
+    document.addEventListener('mousemove', e => {
+      const x = (e.clientX - window.innerWidth / 2) / 40;
+      const y = (e.clientY - window.innerHeight / 2) / 40;
+      document.documentElement.style.setProperty('--move-x', `${x}px`);
+      document.documentElement.style.setProperty('--move-y', `${y}px`);
+    });
+
+  </script>
+
+</body>
+</html>
