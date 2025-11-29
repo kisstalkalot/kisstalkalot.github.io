@@ -6,7 +6,7 @@
 
 body {
   background: #000;
-  font-family: "Papyrus", serif; /* Kept your font choice */
+  font-family: "Papyrus", serif;
   color: white;
   overflow: hidden;
   user-select: none;
@@ -52,26 +52,22 @@ video.bg.active {
 
 #enter-screen:hover { opacity: 0.85; }
 
-/* Center Wrapper 
-   Holds both the profile card and the player.
-   Applies the parallax transform to both.
-*/
+/* Parallax */
 :root {
   --move-x: 0px;
   --move-y: 0px;
-  --card-width: 300px; /* New variable for dynamic player width */
+  --card-width: 300px;
 }
 
 #center-wrapper {
   position: absolute;
   top: 50%; left: 50%;
-  /* Center + Parallax Offset */
   transform: translate(calc(-50% + var(--move-x)), calc(-50% + var(--move-y)));
   
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px; /* Small gap between card and player */
+  gap: 12px;
   
   opacity: 0;
   pointer-events: none;
@@ -79,9 +75,9 @@ video.bg.active {
   z-index: 10;
 }
 
-/* Main Container (Profile) */
+/* Main Container */
 #container {
-  position: relative; /* Changed from absolute to relative to stack flex correctly */
+  position: relative;
   width: 300px;
   height: auto;
   display: flex;
@@ -100,7 +96,7 @@ video.bg.active {
   text-align: center;
 }
 
-/* Side Panel */
+/* ABOUT PANEL */
 .extra-content {
   width: 0;
   opacity: 0;
@@ -111,7 +107,7 @@ video.bg.active {
   flex-direction: column;
   justify-content: flex-start;
   font-size: 14px;
-  white-space: nowrap; /* Prevent text wrap during anim */
+  white-space: nowrap;
 }
 
 #container.show-more {
@@ -126,7 +122,7 @@ video.bg.active {
   white-space: normal;
 }
 
-/* Toggle Button */
+/* ABOUT TAB */
 #bio-toggle {
   position: absolute;
   top: 24px;
@@ -153,8 +149,54 @@ video.bg.active {
   fill: white; opacity: 0.8;
 }
 
-.extra-content::-webkit-scrollbar { width: 4px; }
-.extra-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+/* INFO TAB BUTTON */
+#info-toggle {
+  position: absolute;
+  top: 70px;
+  right: -34px;
+  width: 32px;
+  height: 32px;
+  background: rgba(10,10,10,0.65);
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+#info-toggle img {
+  width: 18px;
+  opacity: 0.8;
+}
+
+#info-toggle:hover {
+  background: rgba(40,40,40,0.65);
+}
+
+/* INFO PANEL */
+.info-content {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  border-left: 1px solid transparent;
+  transition: width 0.4s cubic-bezier(0.25,1,0.5,1), opacity 0.3s ease;
+  padding: 24px 0px;
+}
+
+#container.show-info {
+  width: 500px;
+}
+
+#container.show-info .info-content {
+  width: 200px;
+  opacity: 1;
+  padding: 24px 20px;
+  border-left: 1px solid rgba(255,255,255,0.15);
+}
 
 /* PFP */
 .pfp-wrapper {
@@ -221,11 +263,9 @@ video.bg.active {
   border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;
 }
 
-/* ===========================
-   MEDIA PLAYER STYLES
-   =========================== */
+/* PLAYER */
 #player-container {
-  width: var(--card-width); /* Use variable for width matching */
+  width: var(--card-width);
   height: 80px;
   background: rgba(10,10,10,0.65);
   backdrop-filter: blur(6px);
@@ -235,7 +275,7 @@ video.bg.active {
   align-items: center;
   padding: 0 15px;
   gap: 12px;
-  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Match profile card transition */
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .cover-art {
@@ -256,7 +296,7 @@ video.bg.active {
   flex-direction: column;
   justify-content: center;
   gap: 4px;
-  min-width: 0; /* Text truncation fix */
+  min-width: 0;
 }
 
 .track-title {
@@ -267,7 +307,6 @@ video.bg.active {
   opacity: 0.9;
 }
 
-/* Progress Bar */
 .progress-container {
   width: 100%;
   height: 4px;
@@ -285,7 +324,6 @@ video.bg.active {
   transition: width 0.1s linear;
 }
 
-/* Controls (Simplified for only Play/Pause) */
 .controls-wrapper {
   flex-shrink: 0;
 }
@@ -303,37 +341,21 @@ video.bg.active {
 .play-pause-btn:hover { background: rgba(255,255,255,0.2); }
 .play-pause-btn i { font-size: 10px; margin-left: 1px; } 
 
-/* Volume elements removed */
-.volume-container {
-  display: none;
-}
-
-
-
-
 #credit-pill {
-
   position: fixed;
   bottom: 20px; 
   left: 50%;
-  
-
   transform: translate(calc(-50% + var(--move-x)), calc(0px + var(--move-y)));
-  
-  /* Pill Styling */
-  background: rgba(40, 40, 40, 0.85); /* Grey fill, 85% opaque */
+  background: rgba(40, 40, 40, 0.85);
   backdrop-filter: blur(4px); 
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Light border */
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
-  
-  /* Text Styling */
   color: white;
   font-size: 12px;
   padding: 6px 14px; 
-  z-index: 100; /* Ensure it is visible */
+  z-index: 100;
   pointer-events: none; 
 }
-
 
 /* Parallax Overlay */
 body::before {
