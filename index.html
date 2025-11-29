@@ -5,392 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>kiss</title>
   <link rel="icon" type="image/gif" href="icon.gif">
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #000;
-      font-family: "Papyrus", serif;
-      color: white;
-      overflow: hidden;
-      user-select: none;
-    }
-
-    video.bg {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 1.4s ease;
-    }
-
-    #enter-screen {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 20px;
-      opacity: 1;
-      transition: opacity 0.6s ease;
-      cursor: pointer;
-      z-index: 999;
-    }
-
-    #enter-screen:hover { opacity: 0.85; }
-
-    /* Main Container Wrapper */
-    #container {
-      position: absolute;
-      top: 50%; left: 50%;
-      /* Start with width of main content only */
-      width: 300px;
-      height: auto;
-
-      display: flex; /* Aligns main card and side panel */
-      align-items: stretch;
-
-      background: rgba(10,10,10,0.65);
-      backdrop-filter: blur(6px);
-
-      border: 2px solid rgba(255,255,255,0.1);
-      border-radius: 14px;
-
-      opacity: 0;
-      pointer-events: none; /* Block clicks until entered */
-      
-      /* Smoothly animate width when sidebar opens */
-      transition: opacity 1.4s ease, transform 0.12s ease, width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    :root {
-      --move-x: 0px;
-      --move-y: 0px;
-    }
-
-    #container {
-      transform: translate(
-        calc(-50% + var(--move-x)),
-        calc(-50% + var(--move-y))
-      );
-    }
-
-    /* Inner section for the main profile info */
-    .main-content {
-      width: 300px;
-      flex-shrink: 0; /* Prevents shrinking when side opens */
-      padding: 24px 20px;
-      text-align: center;
-      transition: padding 0.25s ease;
-    }
-
-    /* Side Panel (Bio) */
-    .extra-content {
-      width: 0;
-      opacity: 0;
-      overflow: hidden;
-      border-left: 1px solid transparent; /* Faint grey line hidden initially */
-      transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease, padding 0.3s ease, border-color 0.4s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    /* Open State */
-    #container.show-more {
-      width: 500px; /* 300 main + 200 side */
-    }
-
-    #container.show-more .extra-content {
-      width: 200px;
-      opacity: 1;
-      padding: 24px 20px;
-      border-left-color: rgba(255,255,255,0.15); /* The faint grey line */
-    }
-
-    /* Toggle Button */
-    #bio-toggle {
-      position: absolute;
-      top: 24px;
-      /* Attached to the right edge of container */
-      right: -34px; 
-      width: 32px;
-      height: 32px;
-      
-      background: rgba(10,10,10,0.65);
-      backdrop-filter: blur(6px);
-      border: 2px solid rgba(255,255,255,0.1);
-      border-left: none;
-      border-radius: 0 8px 8px 0;
-      
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: background 0.2s ease, right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-      z-index: 2;
-    }
-
-    #bio-toggle:hover {
-      background: rgba(40,40,40,0.65);
-    }
-
-    #bio-toggle svg {
-      width: 16px;
-      height: 16px;
-      fill: white;
-      opacity: 0.8;
-    }
-
-    /* Scrollbar for side panel */
-    .extra-content::-webkit-scrollbar { width: 4px; }
-    .extra-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
-
-
-    /* --- Profile Animation Logic --- */
-
-    .pfp-wrapper {
-      width: 110px;
-      height: 110px;
-      margin: 0 auto 14px auto;
-      padding: 4px;
-      border-radius: 50%;
-      border: 3px solid yellow;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 0 18px rgba(255,255,0,0.25);
-      transition: margin 0.25s ease;
-    }
-
-    /* Vertical Expansion Logic on Hover */
-    #container.extended .main-content {
-      padding-top: 36px;
-    }
-
-    #container.extended .pfp-wrapper {
-      margin-top: -12px;
-      margin-bottom: 26px;
-    }
-
-    #container.extended .hover-uid {
-      transform: translateY(12px);
-    }
-
-
-    .pfp {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      animation: spin 7s linear infinite;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    #bio {
-      font-size: 32px;
-      opacity: 0.75;
-      margin-bottom: 18px;
-      letter-spacing: 0.5px;
-    }
-
-    .hover-uid {
-      position: relative;
-      display: inline-block;
-      transition: transform 0.25s ease;
-    }
-
-    .uid-box {
-      position: absolute;
-      bottom: 105%; /* Closer to text */
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(100,100,100,0.35);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      white-space: nowrap;
-      opacity: 0;
-      backdrop-filter: blur(6px);
-      transition: opacity 0.25s ease;
-      pointer-events: none;
-    }
-
-    .hover-uid:hover .uid-box {
-      opacity: 1;
-    }
-
-    .icons {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 15px;
-    }
-
-    .icons img {
-      width: 32px;
-      opacity: 0.8;
-      transition: 0.2s ease;
-      filter: drop-shadow(0 0 4px rgba(255,255,255,0.25));
-      cursor: pointer;
-    }
-
-    .icons img:hover {
-      opacity: 1;
-      transform: translateY(-2px) scale(1.12);
-    }
-
-    .volume-box {
-      width: 100%;
-      margin-top: 6px;
-      display: flex;
-      justify-content: center;
-    }
-
-    input[type="range"] {
-      width: 85%;
-      cursor: pointer;
-      -webkit-appearance: none; 
-      background: rgba(255,255,255,0.15);
-      height: 4px;
-      border-radius: 3px;
-      outline: none;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      background: white;
-      border-radius: 50%;
-      box-shadow: 0 0 6px rgba(255,255,255,0.5);
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: url('parallax_layer.png') center/cover no-repeat;
-      opacity: 0.25;
-      pointer-events: none;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
 
-  <video class="bg" id="bgVideo" src="bg.mp4" autoplay loop muted></video>
+  <div id="bg-layer">
+    <video class="bg active" id="bgVideo" src="bg.mp4" autoplay loop muted playsinline></video>
+    <video class="bg" id="bgVideoNext" src="" loop muted playsinline></video>
+  </div>
 
   <div id="enter-screen">kiss</div>
 
-  <div id="container">
+  <div id="center-wrapper">
     
-    <div id="bio-toggle">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-    </div>
-
-    <div class="main-content">
-      <div class="pfp-wrapper">
-        <img class="pfp" src="pfp.webp">
-      </div>
-
-      <div id="bio" class="hover-uid">
-        kiss666
-        <span class="uid-box">UID 666</span>
-      </div>
-
-      <div class="icons">
-        <a href="https://steamcommunity.com/id/suchadrunkfuckkkk/" target="_blank">
-          <img src="steam.gif">
-        </a>
-        <a href="https://last.fm/user/dopesmoker777" target="_blank">
-          <img src="lastfm.gif">
-        </a>
-        <a href="https://discord.com/users/1379582916861886527" target="_blank">
-          <img src="discord.gif">
-        </a>
-      </div>
-
-      <div class="volume-box">
-        <input type="range" id="volumeSlider" min="0" max="100" value="85">
-      </div>
-    </div>
-
-    <div class="extra-content">
-      <h3 style="margin-bottom: 10px; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">about</h3>
-      <p>
-        14 y.o programmer / graphic designer from USA<br><br>
-        i love my girlfriend ryleigh<br><br> 
-      </p>
-    </div>
-
-  </div>
-
-  <audio id="song" src="song.mp3" loop></audio>
-
-  <script>
-    const enter = document.getElementById("enter-screen");
-    const bgVideo = document.getElementById("bgVideo");
-    const container = document.getElementById("container");
-    const song = document.getElementById("song");
-    const slider = document.getElementById("volumeSlider");
-    const hoverUid = document.querySelector(".hover-uid");
-    const bioToggle = document.getElementById("bio-toggle");
-
-    enter.addEventListener("click", () => {
-      enter.style.opacity = 0;
-      setTimeout(() => enter.remove(), 700);
-
-      bgVideo.style.opacity = 1;
-      container.style.opacity = 1;
+    <div id="container">
       
-      // Enable interactions on the card
-      container.style.pointerEvents = "auto";
+      <div id="bio-toggle">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+      </div>
 
-      song.volume = slider.value / 100;
-      song.play().catch(() => {});
-    });
+      <div class="main-content">
+        <div class="pfp-wrapper">
+          <img class="pfp" src="pfp.webp" onerror="this.style.display='none'">
+        </div>
 
-    slider.addEventListener("input", () => {
-      song.volume = slider.value / 100;
-    });
+        <div id="bio" class="hover-uid">
+          kiss666
+          <span class="uid-box">UID 666</span>
+        </div>
 
-    document.addEventListener("mousemove", e => {
-      const x = (e.clientX - window.innerWidth / 2) / 40;
-      const y = (e.clientY - window.innerHeight / 2) / 40;
+        <div class="icons">
+          <a href="https://steamcommunity.com/id/suchadrunkfuckkkk/" target="_blank">
+            <img src="steam.gif" alt="Steam">
+          </a>
+          <a href="https://last.fm/user/dopesmoker777" target="_blank">
+            <img src="lastfm.gif" alt="LastFM">
+          </a>
+          <a href="https://discord.com/users/1379582916861886527" target="_blank">
+            <img src="discord.gif" alt="Discord">
+          </a>
+        </div>
+      </div>
 
-      document.documentElement.style.setProperty("--move-x", `${x}px`);
-      document.documentElement.style.setProperty("--move-y", `${y}px`);
-    });
+      <div class="extra-content">
+        <h3 class="about-title">about</h3>
+        <p>
+          14 y.o programmer / graphic designer from USA<br><br>
+          i love my girlfriend ryleigh<br><br> 
+        </p>
+      </div>
 
-    // Vertical Expansion (Main Card Only)
-    hoverUid.addEventListener('mouseenter', () => {
-      container.classList.add('extended');
-    });
+    </div>
 
-    hoverUid.addEventListener('mouseleave', () => {
-      container.classList.remove('extended');
-    });
+    <div id="player-container">
+      <div class="cover-art">
+        <img id="track-cover" src="pfp.webp" alt="Cover">
+      </div>
+      
+      <div class="track-info">
+        <div class="track-artist" id="track-artist" style="font-size: 11px; opacity: 0.7;">Unknown Artist</div>
+        <div class="track-title" id="track-title" style="margin-top: -2px;">Loading...</div>
+        
+        <div class="progress-container" id="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+      
+      <div class="controls-wrapper">
+        <div class="play-pause-btn" id="play-btn" style="display: flex;">
+          <i class="fa-solid fa-play"></i>
+        </div>
+        <div class="play-pause-btn" id="pause-btn" style="display: none;">
+          <i class="fa-solid fa-pause"></i>
+        </div>
+      </div>
+    </div>
 
-    // Horizontal Expansion (Side Bar)
-    bioToggle.addEventListener('click', () => {
-      container.classList.toggle('show-more');
-    });
-  </script>
+
+
+   
+
+  </div> <div id="credit-pill">
+    Made with 💕 by kiss666
+  </div>
+  
+  <audio id="audio-player"></audio>
+
+  <script src="script.js"></script>
 
 </body>
 </html>
